@@ -20,9 +20,9 @@ from trl.ppo import PPOTrainer
 from trl.core import build_bert_batch_from_txt
 
 config = {
-    "lm_name": "lvwerra/gpt2-imdb",
-    "ref_lm_name": "lvwerra/gpt2-imdb",
-    "cls_model_name": "lvwerra/bert-imdb",
+    "lm_name": "gpt2-imdb",
+    "ref_lm_name": "gpt2-imdb",
+    "cls_model_name": "bert-imdb",
     "tk_name": "gpt2",
     "steps": 51200,
     "batch_size": 256,

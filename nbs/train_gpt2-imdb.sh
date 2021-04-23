@@ -1,7 +1,8 @@
-python run_clm.py \
+CUDA_VISIBLE_DEVICES=0 nohup python -u run_clm.py \
     --model_name_or_path gpt2 \
-    --train_file path_to_train_file \
-    --validation_file path_to_validation_file \
+    --train_file ../data/imdb-dataset.train.csv \
+    --validation_file ../data/imdb-dataset.eval.csv \
     --do_train \
     --do_eval \
-    --output_dir /tmp/test-clm
+    --block_size 256 \
+    --output_dir gpt2-imdb > train_gpt2-imdb.log &
