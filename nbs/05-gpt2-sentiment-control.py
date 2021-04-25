@@ -1,5 +1,3 @@
-%load_ext autoreload
-%autoreload 2
 
 import torch
 import wandb
@@ -22,11 +20,11 @@ from trl.core import build_bert_batch_from_txt
 config = {
     "lm_name": "gpt2-imdb",
     "ref_lm_name": "gpt2-imdb",
-    "cls_model_name": "bert-imdb",
+    "cls_model_name": "bert-imdb/checkpoint-15000-epoch-3",
     "tk_name": "gpt2",
     "steps": 51200,
-    "batch_size": 256,
-    "forward_batch_size": 16,
+    "batch_size": 64,
+    "forward_batch_size": 4,
     "ppo_epochs": 4,   
     "txt_in_len": 5,
     "txt_out_len": 20,
@@ -44,7 +42,7 @@ config = {
 
 np.random.seed(config['seed'])
 
-wandb.init(name='long-response', project='gpt2-ctrl', config=config)
+wandb.init(project='gpt2-ctrl', config=config)
 
 # makes sure you download the imdb-dataset in the data folder
 df = pd.read_csv('../data/imdb-dataset.csv')
@@ -60,29 +58,21 @@ df.head()
 sentiment_model = AutoModelForSequenceClassification.from_pretrained(config["cls_model_name"])
 sentiment_tokenizer = AutoTokenizer.from_pretrained(config["cls_model_name"])
 
-text = 'this movie was really bad!!'
-output = sentiment_model.forward(sentiment_tokenizer.encode(text, return_tensors="pt"))
-output
-
-text = 'this movie was really good!!'
-output = sentiment_model.forward(sentiment_tokenizer.encode(text, return_tensors="pt"))
-output
-
-text = 'this movie was a documentary'
-output = sentiment_model.forward(sentiment_tokenizer.encode(text, return_tensors="pt"))
-output
-
-output[0][0, 1]
-
 gpt2_model = GPT2HeadWithValueModel.from_pretrained(config['lm_name'])
 gpt2_model_ref = GPT2HeadWithValueModel.from_pretrained(config['ref_lm_name'])
 gpt2_tokenizer = GPT2Tokenizer.from_pretrained(config['tk_name'])
 
+'''
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 _ = gpt2_model.to(device)
 _ = sentiment_model.to(device)
 _ = gpt2_model_ref.to(device)
+'''
+
+device = torch.cuda.current_device()
+gpt2_model = torch.nn.DataParallel(gpt2_model).to(device)
+gpt2_model_ref = torch.nn.DataParallel(gpt2_model_ref).to(device)
+sentiment_model = torch.nn.DataParallel(sentiment_model).to(device)
 
 wandb.watch(gpt2_model, log='all')
 
