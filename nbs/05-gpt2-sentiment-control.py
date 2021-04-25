@@ -25,7 +25,7 @@ config = {
     "steps": 51200,
     "batch_size": 64,
     "forward_batch_size": 4,
-    "ppo_epochs": 4,   
+    "ppo_epochs": 4,
     "txt_in_len": 5,
     "txt_out_len": 20,
     "lr": 1.41e-5,
@@ -62,17 +62,16 @@ gpt2_model = GPT2HeadWithValueModel.from_pretrained(config['lm_name'])
 gpt2_model_ref = GPT2HeadWithValueModel.from_pretrained(config['ref_lm_name'])
 gpt2_tokenizer = GPT2Tokenizer.from_pretrained(config['tk_name'])
 
-'''
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _ = gpt2_model.to(device)
 _ = sentiment_model.to(device)
 _ = gpt2_model_ref.to(device)
 '''
-
 device = torch.cuda.current_device()
 gpt2_model = torch.nn.DataParallel(gpt2_model).to(device)
 gpt2_model_ref = torch.nn.DataParallel(gpt2_model_ref).to(device)
 sentiment_model = torch.nn.DataParallel(sentiment_model).to(device)
+'''
 
 wandb.watch(gpt2_model, log='all')
 
@@ -217,11 +216,6 @@ for ctrl in ctrl_str:
 df_results = pd.DataFrame(game_data)
 df_results
 
-print('mean:')
-display(df_results.mean())
-print()
-print('median:')
-display(df_results.median())
 
 input_string = '[negative] The movie'
 input_tokens = gpt2_tokenizer.encode(input_string, return_tensors="pt").to(device)
