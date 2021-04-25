@@ -253,8 +253,9 @@ response_tensors = respond_to_batch(gpt2_model, input_tokens, txt_len=config['tx
 response_strings = gpt2_tokenizer.decode(response_tensors[0, :])
 response_strings
 
-#os.makedirs('gpt2-imdb-ctrl')
-gpt2_model.save_pretrained('gpt2-imdb-ctrl')
-gpt2_tokenizer.save_pretrained('gpt2-imdb-ctrl')
+save_dir = 'gpt2-imdb-ctrl-0'
+#os.makedirs(save_dir)
+gpt2_model.save_pretrained(save_dir)
+gpt2_tokenizer.save_pretrained(save_dir)
 
 
